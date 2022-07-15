@@ -1,19 +1,16 @@
 #include "monty.h"
-/**
- *free_stack- frees all elements of stack
- *@stack: a ptr to the head node
- *
- */
-void free_stack(stack_t **stack)
-{
-	stack_t *node = NULL;
 
-	if (!stack || !*stack)
+/**
+* free_stack - frees the entire stack
+* @stack: stack to be freed
+* @line_number: number of the line
+*
+* Return: nothing
+*/
+void free_stack(stack_t **stack, unsigned int line_number)
+{
+	if (stack == NULL)
 		return;
-	while (*stack)
-	{
-		node = *stack;
-		*stack = (*stack)->next;
-		free(node);
-	}
+	while (*stack != NULL)
+		pop(stack, line_number);
 }
