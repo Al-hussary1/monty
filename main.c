@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 /* file open error */
 		file_error();
 /* read each line, store values into buffer and execute op-function */
-	while (getline(&line_buf, &buf_size, file_ptr) != -1)
+	while ((bytes_read = getline(&line_buf, &buf_size, file_ptr)) != -1)
 	{
 		line_number++;
 		tokens = sscanf(line_buf, "%s %s", op_buf, val_buf);
