@@ -58,7 +58,7 @@ void op_mod(stack_t **stack, unsigned int line_number);
 void op_pchar(stack_t **stack, unsigned int line_number);
 void rotr(stack_t **stack, unsigned int line_count);
 void rotl(stack_t **stack, unsigned int line_count);
-void pstr(stack_t **stack, unsigned int line_cnt __attribute__((unused)));
+void op_pchar(stack_t **stack, unsigned int line_number);
 
 /* error handling functions */
 void file_error(void);
