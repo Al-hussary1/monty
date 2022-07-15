@@ -6,9 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
-
-
-
+#include <stddef.h>
 /**
  * struct stack_s - doubly linked list representation of a stack (or queue)
  * @n: integer
@@ -24,6 +22,7 @@ typedef struct stack_s
 	struct stack_s *prev;
 	struct stack_s *next;
 } stack_t;
+
 /**
  * struct instruction_s - opcode and its function
  * @opcode: the opcode
@@ -38,60 +37,62 @@ typedef struct instruction_s
 	void (*f)(stack_t **stack, unsigned int line_number);
 } instruction_t;
 
-/* helper functions */
-void (*get_op_func(char *str))(stack_t **stack, unsigned int line_number);
-void free_stack(stack_t **stack);
-
-/* opcode functions */
-void op_push(stack_t **stack, unsigned int line_number);
-void op_pall(stack_t **stack, unsigned int line_number);
-void op_pint(stack_t **stack, unsigned int line_number);
-void op_pop(stack_t **stack, unsigned int line_number);
-void op_swap(stack_t **stack, unsigned int line_number);
-void op_add(stack_t **stack, unsigned int line_number);
-void op_nop(stack_t **stack, unsigned int line_number);
-void op_sub(stack_t **stack, unsigned int line_number);
-void op_div(stack_t **stack, unsigned int line_number);
-void op_mul(stack_t **stack, unsigned int line_number);
-void op_mod(stack_t **stack, unsigned int line_number);
-void op_pchar(stack_t **stack, unsigned int line_number);
-
-
-/* error handling functions */
-void file_error(void);
-void usage_error(void);
-void malloc_error(stack_t **stack);
-
-/* opcode error handling */
-void opcode_error(stack_t **stack, unsigned int line_number);
-void push_error(stack_t **stack, unsigned int line_number);
-void pint_error(stack_t **stack, unsigned int line_number);
-void pop_error(stack_t **stack, unsigned int line_number);
-void swap_error(stack_t **stack, unsigned int line_number);
-void add_error(stack_t **stack, unsigned int line_number);
-void sub_error(stack_t **stack, unsigned int line_number);
-void div_error(stack_t **stack, unsigned int line_number);
-void zero_error(stack_t **stack, unsigned int line_number);
-void mul_error(stack_t **stack, unsigned int line_number);
-void mod_error(stack_t **stack, unsigned int line_number);
-void pchar_error(stack_t **stack, unsigned int line_number);
-void char_error(stack_t **stack, unsigned int line_number);
-
-
+#define INSTRUCTIONS { \
+		{"push", push},\
+		{"pall", pall},\
+		{"pint", pint},\
+		{"pop", pop},\
+		{"swap", swap},\
+		{"nop", nop},\
+		{"div", _div},\
+		{"mul", _mul},\
+		{"add", _add},\
+		{"sub", _sub},\
+		{"mod", mod},\
+		{"pchar", pchar},\
+		{"pstr", pstr},\
+		{"rotl", rotl},\
+		{"rotr", rotr},\
+		{NULL, NULL} \
+	}
 /**
- * struct stack_val - global shared variables
- * @n: value of new node
- * @file: Monty file being read
- * @opcode: parsed command token
- * @qu: switch to queue mode (FIFO) - 0 for off, 1 for on
- * Description: contains useful information for error handling
- */
-struct stack_val
+* struct help - argument for the current opcode
+* @data_struct: stack mode, stack (default) and queue
+* @argument: the arguments of the string
+*
+* Description: global structure used to pass data around the functions easily
+*/
+typedef struct help
 {
-	char *n;
-	char *file;
-	char *opcode;
-	int qu;
-} stack_val;
+	int data_struct;
+	char *argument;
+} help;
+help global;
 
+extern int status;
+
+void push(stack_t **stack, unsigned int line_cnt);
+void pall(stack_t **stack, unsigned int line_cnt);
+void pint(stack_t **stack, unsigned int line_cnt);
+void swap(stack_t **stack, unsigned int line_cnt);
+void pop(stack_t **stack, unsigned int line_cnt);
+void nop(stack_t **stack, unsigned int line_cnt);
+void _div(stack_t **stack, unsigned int line_cnt);
+void _add(stack_t **stack, unsigned int line_cnt);
+void _sub(stack_t **stack, unsigned int line_cnt);
+void _mul(stack_t **stack, unsigned int line_cnt);
+void mod(stack_t **stack, unsigned int line_cnt);
+void pchar(stack_t **stack, unsigned int line_cnt);
+void pstr(stack_t **stack, unsigned int line_cnt);
+void rotl(stack_t **stack, unsigned int line_count);
+void rotr(stack_t **stack, unsigned int line_count);
+void opcode(stack_t **stack, char *str, unsigned int line_cnt);
+
+int is_digit(char *string);
+int isnumber(char *str);
+
+stack_t *add_node(stack_t **stack, const int n);
+stack_t *queue_node(stack_t **stack, const int n);
+void free_stack(stack_t *stack);
+size_t print_stack(const stack_t *stack);
 #endif
