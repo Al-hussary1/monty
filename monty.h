@@ -6,7 +6,10 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdarg.h>
 
 
 /**
@@ -43,8 +46,8 @@ void (*get_op_func(char *str))(stack_t **stack, unsigned int line_number);
 void free_stack(stack_t **stack);
 
 /* opcode functions */
-void op_push(stack_t **stack, unsigned int line_number);
-void op_pall(stack_t **stack, unsigned int line_number);
+void op_push(stack_t **head, unsigned int line_number);
+void op_pall(stack_t **head, unsigned int line_number);
 void op_pint(stack_t **stack, unsigned int line_number);
 void op_pop(stack_t **stack, unsigned int line_number);
 void op_swap(stack_t **stack, unsigned int line_number);
