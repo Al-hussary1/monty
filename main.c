@@ -1,75 +1,54 @@
 #include "monty.h"
 
 /**
- * error_usage - prints usage message and exits
+ * main - intepreter for Monty ByteCode files
+ * @argc: argument count
+ * @argv: array of argument tokens
  *
- * Return: nothing
- */
-void error_usage(void)
-{
-	fprintf(stderr, "USAGE: monty file\n");
-	exit(EXIT_FAILURE);
-}
-
-/**
- * file_error - prints file error message and exits
- * @argv: argv given by manin
- *
- * Return: nothing
- */
-void file_error(char *argv)
-{
-	fprintf(stderr, "Error: Can't open file %s\n", argv);
-	exit(EXIT_FAILURE);
-}
-
-int status = 0;
-/**
- * main - entry point
- * @argv: list of arguments passed to our program
- * @argc: ammount of args
- *
- * Return: nothing
+ * Return: always 0
  */
 int main(int argc, char **argv)
 {
-	FILE *file;
-	size_t buf_len = 0;
-	char *buffer = NULL;
-	char *str = NULL;
+	FILE *file_ptr;
+	char *line_buf = NULL, op_buf[20], val_buf[20];
+	ssize_t bytes_read = 0, tokens = 0;
+	size_t buf_size = 0;
+	unsigned int line_number = 0;
 	stack_t *stack = NULL;
-	unsigned int line_cnt = 1;
 
-	global.data_struct = 1;
-	if (argc != 2)
-		error_usage();
-
-	file = fopen(argv[1], "r");
-
-	if (!file)
-		file_error(argv[1]);
-
-	while (getline(&buffer, &buf_len, file) != -1)
+	if (argc != 2 || !argv[1])
+		usage_error();
+	stack_val.qu = 0; /*  default to stack mode */
+/* open requested Monty ByteCode file */
+	stack_val.file = argv[1];
+	file_ptr = fopen(stack_val.file, "r");
+	if (!file_ptr)
+/* file open error */
+		file_error();
+/* read each line, store values into buffer and execute op-function */
+	while (getline(&line_buf, &buf_size, file_ptr) != -1)
 	{
-		if (status)
-			break;
-		if (*buffer == '\n')
+		line_number++;
+		tokens = sscanf(line_buf, "%s %s", op_buf, val_buf);
+
+		if (tokens > 2)
 		{
-			line_cnt++;
-			continue;
+/* usage error */
+			free(line_buf);
+			usage_error();
 		}
-		str = strtok(buffer, " \t\n");
-		if (!str || *str == '#')
-		{
-			line_cnt++;
-			continue;
-		}
-		global.argument = strtok(NULL, " \t\n");
-		opcode(&stack, str, line_cnt);
-		line_cnt++;
+/* line buffer transfered line read */
+		free(line_buf);
+		line_buf = NULL;
+		stack_val.opcode = op_buf;
+		stack_val.n = val_buf;
+		if (tokens > 0 && stack_val.opcode[0] != '#')
+			get_op_func(stack_val.opcode)(&stack, line_number);
+		memset(op_buf, '\0', sizeof(op_buf));
+		memset(val_buf, '\0', sizeof(val_buf));
 	}
-	free(buffer);
-	free_stack(stack);
-	fclose(file);
-	exit(status);
+	free(line_buf);
+	free_stack(&stack);
+	fclose(file_ptr);
+	return (0);
 }
